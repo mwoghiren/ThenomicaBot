@@ -131,7 +131,7 @@ def check_for_prop_posts():
       comments = submission.comments
       already_balloted = False
       for comment in comments:
-        if comment.author.name == bot_name:
+        if comment.body == 'Ballot':
           already_balloted = True
           break
       if not already_balloted:
