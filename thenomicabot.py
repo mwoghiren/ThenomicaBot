@@ -1,10 +1,12 @@
 import praw, re, time
+from urllib2 import HTTPError
 
 ##########
 # Colors #
 ##########
 
 BLUE = '\033[94m'
+RED = '\033[91m'
 END_COLOR = '\033[0m'
 
 #############
@@ -158,14 +160,18 @@ check_if_checkin_required()
 current_day = time.strftime('%A')
 
 while True:
-  # If the day has changed, check whether we need a new check-in post.
-  if current_day != time.strftime('%A'):
-    print "It's a new day!  Checking if a [Check-In] post is required."
-    current_day = time.strftime('%A')
-    check_if_checkin_required()
+  try:
+    # If the day has changed, check whether we need a new check-in post.
+    if current_day != time.strftime('%A'):
+      print "It's a new day!  Checking if a [Check-In] post is required."
+      current_day = time.strftime('%A')
+      check_if_checkin_required()
 
-  # Check for any unballoted [Prop] posts.
-  check_for_prop_posts()
+    # Check for any unballoted [Prop] posts.
+    check_for_prop_posts()
+  except HTTPError, e:
+    # We've encountered a problem.  Log it and keep going.
+    print RED + "Encountered a " + e.code + " error.  Continuing." + END_COLOR
 
   # Only check every ten seconds.
   time.sleep(10)
