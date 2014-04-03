@@ -1,5 +1,4 @@
-import praw, re, time
-from urllib2 import HTTPError
+import praw, re, requests, time
 
 ##########
 # Colors #
@@ -169,9 +168,9 @@ while True:
 
     # Check for any unballoted [Prop] posts.
     check_for_prop_posts()
-  except HTTPError, e:
+  except requests.exceptions.HTTPError as e:
     # We've encountered a problem.  Log it and keep going.
-    print RED + "Encountered a " + e.code + " error.  Continuing." + END_COLOR
+    print RED + "Encountered a " + e.response.status_code + " error.  Continuing." + END_COLOR
 
   # Only check every ten seconds.
   time.sleep(10)
