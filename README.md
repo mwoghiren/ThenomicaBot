@@ -13,3 +13,4 @@ In the future, we hope he will take on the following duties:
 * Update the idle players list based on check-ins.
 * Keep the location directory up-to-date.
 * Detect and mark edited proposals.
+* Count votes and update posts (and the rules?) accordingly.
