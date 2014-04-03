@@ -18,6 +18,15 @@ bot_name = ''
 r = ''
 subreddit = ''
 
+# This is used to determine just how much [Prop] checking should be done.
+# Higher levels do the work indicated *and* all the work before it.
+# 0: Check [Prop]s for ballots.
+# 1: Check [Prop]s for vote completion.
+prop_check_level = 0;
+
+# This is the number of new posts to get from the subreddit, for each [Prop] check level.
+prop_check_limit = [5, 50]
+
 #############
 # Functions #
 #############
@@ -109,7 +118,7 @@ def check_if_checkin_required():
 # Balloting
 ###
 
-def ballot(submission):
+def create_ballot(submission):
   # Add a ballot comment.
   print "  Balloting..."
   ballot = submission.add_comment('Ballot')
@@ -125,19 +134,35 @@ def ballot(submission):
   # All done!
   print "  Done."
 
-def check_for_prop_posts():
-  submissions = subreddit.get_new(limit=10)
+def check_for_ballot_completion(submission, ballot):
+  # Not implemented!
+  pass
+
+def locate_ballot(submission):
+  # Check the top-level comments for a ballot.
+  comments = submission.comments
+  ballot = ""
+  for comment in comments:
+    if comment.body == 'Ballot':
+      ballot = comment
+      break
+
+  # If we didn't find a ballot, add one.
+  # If we did, and the [Prop] check level allows, check if voting has closed.
+  if ballot == "":
+    print BLUE + "Found unballoted post: \"" + submission.title + "\".  Balloting." + END_COLOR
+    create_ballot(submission)
+  else:
+    if prop_check_level == 1:
+      check_for_ballot_completion(submission, ballot)
+
+def check_prop_posts():
+  current_limit = prop_check_limit[prop_check_level]
+  submissions = subreddit.get_new(limit=current_limit)
   for submission in submissions:
     if submission.title.startswith('[Prop]'):
-      comments = submission.comments
-      already_balloted = False
-      for comment in comments:
-        if comment.body == 'Ballot':
-          already_balloted = True
-          break
-      if not already_balloted:
-        print BLUE + "Found unballoted post: " + submission.title + "!  Balloting." + END_COLOR
-        ballot(submission)
+      # Locate the ballot.
+      locate_ballot(submission)
 
 ########
 # Main #
@@ -158,6 +183,9 @@ check_if_checkin_required()
 # Now, we track the current day of the week.
 current_day = time.strftime('%A')
 
+# This counter is used to manipulate the [Prop] check level.
+prop_check_counter = 0
+
 while True:
   try:
     # If the day has changed, check whether we need a new check-in post.
@@ -166,8 +194,17 @@ while True:
       current_day = time.strftime('%A')
       check_if_checkin_required()
 
-    # Check for any unballoted [Prop] posts.
-    check_for_prop_posts()
+    # Update the [Prop] check level.
+    # Every six iterations, we use [Prop] check level 1.
+    prop_check_counter += 1
+    if prop_check_counter == 6:
+      prop_check_counter = 0
+      prop_check_level = 1
+    else:
+      prop_check_level = 0
+
+    # Check [Prop] posts for ballots and completion.
+    check_prop_posts()
   except requests.exceptions.HTTPError as e:
     # We've encountered a problem.  Log it and keep going.
     print RED + "Encountered a " + e.response.status_code + " error.  Continuing." + END_COLOR
