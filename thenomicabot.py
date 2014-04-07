@@ -208,6 +208,10 @@ while True:
   except requests.exceptions.HTTPError as e:
     # We've encountered a problem.  Log it and keep going.
     print RED + "Encountered a " + str(e.response.status_code) + " error.  Continuing." + END_COLOR
+  except requests.exceptions.ConnectionError as e:
+    # We've encountered a problem.  Log it and keep going.
+    print RED + "Encountered a connection error.  Continuing." + END_COLOR
+
 
   # Only check every ten seconds.
   time.sleep(10)
