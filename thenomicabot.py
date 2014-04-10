@@ -73,7 +73,8 @@ def login():
 def create_checkin_post(checkin_number, date):
   # Create the submission.
   print "  Creating the submission..."
-  title = '[Check-In] #' + str(checkin_number) + ': ' + date
+  round_number = 1
+  title = '[Check-In] #' + str(round_number) + '.' + str(checkin_number) + ': ' + date
   text = "Please add a top-level comment to this post to avoid becoming idle."
   submission = subreddit.submit(title, text)
 
