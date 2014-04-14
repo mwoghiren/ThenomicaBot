@@ -104,7 +104,7 @@ def check_if_checkin_required():
       if last_checkin_date != current_date:
         # We need to check in!  Determine the next number and create the post.
         print BLUE + "  We need to check in!  Creating new check-in post..." + END_COLOR
-        next_checkin_number = int(re.search('\d+', submission.title).group(0)) + 1
+        next_checkin_number = int(re.search('\d+:', submission.title).group(0)[:-1]) + 1
         create_checkin_post(next_checkin_number, current_date)
       else:
         # There's already a check-in post for today.
