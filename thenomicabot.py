@@ -186,7 +186,7 @@ def check_prop_posts():
     if submission.title.startswith('[Prop]') and is_post_valid(submission):
 
       # Check for edited (aka invalid) props
-      if check_ballot_validity(submission):
+      if not check_ballot_validity(submission):
         invalidate_post(submission)
         continue
       
