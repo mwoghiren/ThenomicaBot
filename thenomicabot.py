@@ -140,7 +140,7 @@ def check_for_ballot_completion(submission, ballot):
   pass
 
 # Check if the post has been edited
-def check_ballot_validity(submission):
+def is_ballot_valid(submission):
 
   if submission.edited:
 
@@ -157,9 +157,9 @@ def invalidate_post(submission):
   
   submission.add_comment('Prop was edited and marked invalid')
 
-def is_post_valid(submission):
+def is_post_marked_invalid(submission):
 
-  return submission.link_flair_text != 'Invalid'
+  return submission.link_flair_text == 'Invalid'
 
 def locate_ballot(submission):
   # Check the top-level comments for a ballot.
@@ -183,10 +183,10 @@ def check_prop_posts():
   current_limit = prop_check_limit[prop_check_level]
   submissions = subreddit.get_new(limit=current_limit)
   for submission in submissions:
-    if submission.title.startswith('[Prop]') and is_post_valid(submission):
+    if submission.title.startswith('[Prop]') and not is_post_marked_invalid(submission):
 
       # Check for edited (aka invalid) props
-      if not check_ballot_validity(submission):
+      if is_ballot_valid(submission):
         invalidate_post(submission)
         continue
       
