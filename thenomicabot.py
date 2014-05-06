@@ -142,9 +142,8 @@ def check_for_ballot_completion(submission, ballot):
 # Check if the post has been edited
 def is_ballot_valid(submission):
 
-  if submission.edited:
-
-    return False
+  # Edited posts are invalid
+  return not submission.edited
 
 # Invalidate posts
 def invalidate_post(submission):
