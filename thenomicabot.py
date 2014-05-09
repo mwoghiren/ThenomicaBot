@@ -139,25 +139,21 @@ def check_for_ballot_completion(submission, ballot):
   # Not implemented!
   pass
 
-# Check if the post has been edited
-def is_ballot_valid(submission):
-
-  # Edited posts are invalid
+# Check if the post has been edited.
+def is_prop_valid(submission):
+  # Edited [Prop] posts are invalid.
   return not submission.edited
 
-# Invalidate posts
+# Invalidate the given post.
 def invalidate_post(submission):
-
-  print RED + "  Marked invalid!"
-
-  submission.set_flair( flair_text='Invalid', flair_css_class='voting')
+  print "  Invalidating post..."
+  submission.set_flair(flair_text='Invalid', flair_css_class='')
 
   print "  Telling players..."
-  
-  submission.add_comment('Prop was edited and marked invalid')
+  comment = submission.add_comment("This proposal has been edited and is therefore invalid by rule 4.2.1.")
+  comment.distinguish()
 
 def is_post_marked_invalid(submission):
-
   return submission.link_flair_text == 'Invalid'
 
 def locate_ballot(submission):
@@ -183,14 +179,13 @@ def check_prop_posts():
   submissions = subreddit.get_new(limit=current_limit)
   for submission in submissions:
     if submission.title.startswith('[Prop]') and not is_post_marked_invalid(submission):
-
-      # Check for edited (aka invalid) props
-      if is_ballot_valid(submission):
+      # If the prop is valid, create or check its ballot.
+      # If it's not, invalidate it!
+      if is_prop_valid(submission):
+        locate_ballot(submission)
+      else:
+        print BLUE + "Found edited proposal: \"" + submission.title + "\".  Invalidating." + END_COLOR
         invalidate_post(submission)
-        continue
-      
-      # Locate the ballot.
-      locate_ballot(submission)
 
 ########
 # Main #

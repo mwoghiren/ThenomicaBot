@@ -7,7 +7,7 @@ Right now, he does the following:
 
 * Ballots [Prop] threads within 30 seconds.
 * Posts [Check-In] threads every Monday and Thursday at midnight EST.
-* Detect and mark edited proposals.
+* Detects and invalidates edited proposals.
 
 In the future, we hope he will take on the following duties:
 
