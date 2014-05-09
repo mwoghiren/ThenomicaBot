@@ -95,7 +95,7 @@ def check_if_checkin_required():
 
   # Check the date of the most recent check-in thread.
   print "  Checking the date of the most recent check-in..."
-  submissions = subreddit.get_new()
+  submissions = subreddit.get_new(limit=50)
   for submission in submissions:
     if submission.title.startswith('[Check-In'):
       # We've found the latest check-in post.  Check its date.
