@@ -18,15 +18,6 @@ bot_name = ''
 r = ''
 subreddit = ''
 
-# This is used to determine just how much [Prop] checking should be done.
-# Higher levels do the work indicated *and* all the work before it.
-# 0: Check [Prop]s for ballots.
-# 1: Check [Prop]s for vote completion.
-prop_check_level = 0;
-
-# This is the number of new posts to get from the subreddit, for each [Prop] check level.
-prop_check_limit = [5, 50]
-
 #############
 # Functions #
 #############
@@ -171,11 +162,10 @@ def locate_ballot(submission):
     print BLUE + "Found unballoted post: \"" + submission.title + "\".  Balloting." + END_COLOR
     create_ballot(submission)
   else:
-    if prop_check_level == 1:
-      check_for_ballot_completion(submission, ballot)
+    check_for_ballot_completion(submission, ballot)
 
 def check_prop_posts():
-  current_limit = prop_check_limit[prop_check_level]
+  current_limit = 50
   submissions = subreddit.get_new(limit=current_limit)
   for submission in submissions:
     if submission.title.startswith('[Prop]') and not is_post_marked_invalid(submission):
@@ -206,9 +196,6 @@ check_if_checkin_required()
 # Now, we track the current day of the week.
 current_day = time.strftime('%A')
 
-# This counter is used to manipulate the [Prop] check level.
-prop_check_counter = 0
-
 while True:
   try:
     # If the day has changed, check whether we need a new check-in post.
@@ -216,15 +203,6 @@ while True:
       print "It's a new day!  Checking if a [Check-In] post is required."
       current_day = time.strftime('%A')
       check_if_checkin_required()
-
-    # Update the [Prop] check level.
-    # Every six iterations, we use [Prop] check level 1.
-    prop_check_counter += 1
-    if prop_check_counter == 6:
-      prop_check_counter = 0
-      prop_check_level = 1
-    else:
-      prop_check_level = 0
 
     # Check [Prop] posts for ballots and completion.
     check_prop_posts()
@@ -234,7 +212,6 @@ while True:
   except requests.exceptions.ConnectionError as e:
     # We've encountered a problem.  Log it and keep going.
     print RED + "Encountered a connection error.  Continuing." + END_COLOR
-
 
   # Only check every ten seconds.
   time.sleep(10)
